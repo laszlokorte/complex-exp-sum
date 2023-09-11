@@ -22,6 +22,7 @@
   export let phaseB = 0
 
   export let showSum = true
+  export let hideParts = false
 
 
   $: pointsA = Array(samples).fill(null).map((_,i,a) => (i/a.length - 0.5)*2).map((x) => {
@@ -36,9 +37,8 @@
   })
 </script>
 
-<T.Mesh
-  position.y={3}
->
+{#if !hideParts}
+<T.Mesh>
   <MeshLineGeometry
     points={pointsA}
   />
@@ -52,9 +52,7 @@
 </T.Mesh>
 
 {#if showB}
-<T.Mesh
-  position.y={3}
->
+<T.Mesh>
   <MeshLineGeometry
     points={pointsB}
   />
@@ -67,11 +65,10 @@
   />
 </T.Mesh>
 {/if}
+{/if}
 
 {#if showB && showSum}
-<T.Mesh
-  position.y={3}
->
+<T.Mesh>
   <MeshLineGeometry
     points={pointsCombined}
   />
@@ -103,5 +100,6 @@
 <Grid
   gridSize={[80, 80]}
   cellColor={'#46536b'}
-  sectionThickness={0}
+  sectionColor={'#46536b'}
+  sectionThickness={1}
 />
