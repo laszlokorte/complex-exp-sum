@@ -1,6 +1,21 @@
 <script>
   import { Canvas } from '@threlte/core'
   import Scene from './Scene.svelte'
+  import {onMount} from 'svelte'
+
+  const numberFormatInt = new Intl.NumberFormat('en-US', { 
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  })
+
+  const numberFormatDecimal = new Intl.NumberFormat('en-US', { 
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })
+
+  let playing = false
+  let speedA = 1
+  let speedB = 1
 
   let freqA = 5
   let ampA = 1
@@ -8,8 +23,9 @@
 
   let showSum = false
   let hideParts = false
-  let showB = false
+  let showB = true
   let conjugate = false
+  let lockPhase = false
 
   let freqB = -5
   let ampB = 1
@@ -18,8 +34,46 @@
   $: if(conjugate) {
     freqB = -freqA
     ampB = ampA
-    phaseB = -phaseA
+    phaseB = -1 * phaseA
+  } else if(lockPhase) {
+    phaseB = phaseA
+    speedB = speedA
   }
+
+  onMount(() => {
+    let frame = null
+
+    const step = () => {
+      frame = null
+
+      if(playing) {
+        phaseA = phaseA + Math.sign(freqA) * speedA / 100
+        phaseB = phaseB + Math.sign(freqB) * speedB / 100
+        while(phaseA > 1) {
+          phaseA -= 2
+        }
+        while(phaseA < -1) {
+          phaseA += 2
+        }
+        while(phaseB > 1) {
+          phaseB -= 2
+        }
+        while(phaseB < -1) {
+          phaseB += 2
+        }
+      }
+
+      frame = requestAnimationFrame(step)
+    }
+
+    step()
+
+    return () => {
+      if(frame) {
+        cancelAnimationFrame(frame)
+      }
+    }
+  })
 </script>
 
 <style>
@@ -41,9 +95,10 @@
     padding: 0;
     margin: 0;
     grid-auto-flow: column;
-    grid-template-rows: 1fr 1fr;
+    grid-template-rows: auto auto;
     grid-auto-columns: auto;
     gap: 0 1em;
+    align-items: start;
   }
 
   dt, dd {
@@ -122,11 +177,11 @@
     <legend>Oscillation A</legend>
 
     <dl>
-      <dt><label for="freqA">Frequency: {freqA}Hz</label></dt>
+      <dt><label for="freqA">Frequency: {numberFormatInt.format(freqA)}Hz</label></dt>
       <dd><input style:accent-color="#3dfe00" type="range" min="-30" max="30" bind:value={freqA} id="freqA" /></dd>
-      <dt><label for="ampA">Amplitude: {ampA}</label></dt>
+      <dt><label for="ampA">Amplitude: {numberFormatDecimal.format(ampA)}</label></dt>
       <dd><input style:accent-color="#3dfe00" type="range" min="0" max="3" step="0.2" bind:value={ampA} id="ampA" /></dd>
-      <dt><label for="phaseA">Phase: {phaseA}</label></dt>
+      <dt><label for="phaseA">Phase: {numberFormatDecimal.format(phaseA)}</label></dt>
       <dd><input style:accent-color="#3dfe00" type="range" min="-1" max="1" step="0.005" bind:value={phaseA} id="phaseA" /></dd>
     </dl>
   </fieldset>
@@ -145,14 +200,40 @@
     </div>
     
     <dl>
-      <dt><label for="freqB">Frequency: {freqB} Hz</label></dt>
+      <dt><label for="freqB">Frequency: {numberFormatInt.format(freqB)} Hz</label></dt>
       <dd><input disabled={conjugate} style:accent-color="#fe3d00" type="range" min="-30" max="30" bind:value={freqB} id="freqB" /></dd>
-      <dt><label for="ampB">Amplitude: {ampB}</label></dt>
+      <dt><label for="ampB">Amplitude: {numberFormatDecimal.format(ampB)}</label></dt>
       <dd><input disabled={conjugate} style:accent-color="#fe3d00" type="range" min="0" max="3" step="0.2" bind:value={ampB} id="ampB" /></dd>
-      <dt><label for="phaseB">Phase: {phaseB}</label></dt>
-      <dd><input disabled={conjugate} style:accent-color="#fe3d00" type="range" min="-1" max="1" step="0.005" bind:value={phaseB} id="phaseB" /></dd>
+      <dt>
+        <label for="phaseB">Phase: {numberFormatDecimal.format(phaseB)}</label></dt>
+      <dd><input disabled={conjugate} style:accent-color="#fe3d00" type="range" min="-1" max="1" step="0.005" bind:value={phaseB} id="phaseB" />
+        {#if !conjugate}
+        <br>
+        <label><input type="checkbox" style:accent-color="#fe3d00" bind:checked={lockPhase}> Same as A</label>
+        {/if}
+      </dd>
     </dl>
     {/if}
+  </fieldset>
+
+   <fieldset>
+    <legend>Play</legend>
+
+
+   <div class="checkbox-list">
+      <label>
+        <input  type="checkbox" bind:checked={playing}> Animate Phase
+      </label>
+      {#if playing}
+      <dl>
+      <dt><label for="speedB">Speed A: {numberFormatDecimal.format(speedA)}</label></dt>
+      <dd><input style:accent-color="#3dfe00" type="range" min="-1" step="0.01" max="1" bind:value={speedA} id="speedB" /></dd>
+      <dt><label for="speedB">Speed B: {numberFormatDecimal.format(speedB)}</label></dt>
+      <dd><input disabled={lockPhase || conjugate} style:accent-color="#fe3d00" type="range" min="-1" step="0.01" max="1" bind:value={speedB} id="speedB" /></dd>
+      </dl>
+      {/if}
+   </div>
+    
   </fieldset>
 
   {#if showB}
@@ -180,14 +261,14 @@
     <summary>Explanation</summary>
     
     <p>
-      Explore how two complex waves/oscillations interfere de- or constructively. Use the controls above to controls the frequency, amplitude and phase of the waves. Enable either both or only one of the waves and Show or hide the sum. 
+      Explore how two complex waves/oscillations interfere de- or constructively. Use the controls above to set the frequency, amplitude and phase of the waves. Enable either both or only one of the waves and show or hide the sum. 
     </p>
 
     <p>
-      If the one wave has the negative frequency of the other wave their sum oscialates in only one direction. The difference of their two phases determines that direction.
+      If the one wave has the opposite(negative) frequency of the other wave their sum oscialates in only one direction because the other direction is cancelled by destructive interference. The difference of their two phases determines the direction in which the interference occurrs. Changing the phase of only one of the summed waves results in the sum to be rotated.
     </p>
     <p>
-      If neither frequency nor amplitude match the resulting sum may look pretty wild. You can show only the sum and hide the two individual waves for a better view.
+      If neither frequency nor amplitude of the two waves match then their sum may look pretty wild. You may enable only the sum and hide the two individual waves for a better view.
     </p>
   </details>
 

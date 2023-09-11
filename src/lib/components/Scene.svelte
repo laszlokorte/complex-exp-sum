@@ -38,18 +38,6 @@
 </script>
 
 {#if !hideParts}
-<T.Mesh>
-  <MeshLineGeometry
-    points={pointsA}
-  />
-
-  <MeshLineMaterial
-    width={4}
-    attenuate={false}
-    scaleDown={0}
-    color="#3dfe00"
-  />
-</T.Mesh>
 
 {#if showB}
 <T.Mesh>
@@ -58,6 +46,7 @@
   />
 
   <MeshLineMaterial
+    depthWrite={false}
     width={4}
     attenuate={false}
     scaleDown={0}
@@ -65,6 +54,21 @@
   />
 </T.Mesh>
 {/if}
+
+<T.Mesh>
+  <MeshLineGeometry
+    points={pointsA}
+  />
+
+  <MeshLineMaterial
+    depthWrite={false}
+    width={4}
+    attenuate={false}
+    scaleDown={0}
+    color="#3dfe00"
+  />
+</T.Mesh>
+
 {/if}
 
 {#if showB && showSum}
@@ -74,6 +78,7 @@
   />
 
   <MeshLineMaterial
+    depthWrite={false}
     width={4}
     attenuate={false}
     scaleDown={0}
