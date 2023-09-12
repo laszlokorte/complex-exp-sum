@@ -37,7 +37,7 @@
   })
 </script>
 
-{#if !hideParts}
+{#if !showSum || !hideParts}
 
 {#if showB}
 <T.Mesh>

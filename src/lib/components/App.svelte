@@ -37,7 +37,7 @@
     phaseB = -1 * phaseA
   } else if(lockPhase) {
     phaseB = phaseA
-    speedB = speedA
+    speedB = (Math.sign(freqB)*Math.sign(freqA) || 1) * speedA
   }
 
   onMount(() => {
@@ -47,8 +47,8 @@
       frame = null
 
       if(playing) {
-        phaseA = phaseA + Math.sign(freqA) * speedA / 100
-        phaseB = phaseB + Math.sign(freqB) * speedB / 100
+        phaseA = phaseA + (Math.sign(freqA)||1) * speedA / 100
+        phaseB = phaseB + (Math.sign(freqB)||1) * speedB / 100
         while(phaseA > 1) {
           phaseA -= 2
         }
@@ -206,7 +206,7 @@
       <dd><input disabled={conjugate} style:accent-color="#fe3d00" type="range" min="0" max="3" step="0.2" bind:value={ampB} id="ampB" /></dd>
       <dt>
         <label for="phaseB">Phase: {numberFormatDecimal.format(phaseB)}</label></dt>
-      <dd><input disabled={conjugate} style:accent-color="#fe3d00" type="range" min="-1" max="1" step="0.005" bind:value={phaseB} id="phaseB" />
+      <dd><input disabled={conjugate || lockPhase} style:accent-color="#fe3d00" type="range" min="-1" max="1" step="0.005" bind:value={phaseB} id="phaseB" />
         {#if !conjugate}
         <br>
         <label><input type="checkbox" style:accent-color="#fe3d00" bind:checked={lockPhase}> Same as A</label>
