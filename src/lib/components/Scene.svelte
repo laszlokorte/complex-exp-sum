@@ -37,6 +37,16 @@
   })
 </script>
 
+
+<Grid
+  gridSize={[80, 80]}
+  cellColor={'#46536b'}
+  sectionColor={'#46536b'}
+  sectionThickness={1}
+  depthWrite={false}
+  depthTest={true}
+/>
+
 {#if !showSum || !hideParts}
 
 {#if showB}
@@ -46,7 +56,6 @@
   />
 
   <MeshLineMaterial
-    depthWrite={false}
     width={4}
     attenuate={false}
     scaleDown={0}
@@ -61,7 +70,6 @@
   />
 
   <MeshLineMaterial
-    depthWrite={false}
     width={4}
     attenuate={false}
     scaleDown={0}
@@ -78,7 +86,6 @@
   />
 
   <MeshLineMaterial
-    depthWrite={false}
     width={4}
     attenuate={false}
     scaleDown={0}
@@ -101,10 +108,3 @@
   />
 </T.PerspectiveCamera>
 
-
-<Grid
-  gridSize={[80, 80]}
-  cellColor={'#46536b'}
-  sectionColor={'#46536b'}
-  sectionThickness={1}
-/>
