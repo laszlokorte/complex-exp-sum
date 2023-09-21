@@ -9,6 +9,7 @@
   } from '@threlte/extras'
   import { Vector3, CatmullRomCurve3 } from 'three'
 
+  export let polar = false
   export let samples = 1000
   export let perspective = true
 
@@ -24,16 +25,37 @@
   export let showSum = true
   export let hideParts = false
 
-
   $: pointsA = Array(samples).fill(null).map((_,i,a) => (i/a.length - 0.5)*2).map((x) => {
-    return new Vector3(x*40, Math.cos(x*Math.PI*2*freqA + phaseA*Math.PI*2)*ampA*3, Math.sin(x*Math.PI*2*freqA + phaseA*Math.PI*2)*ampA*3)
+    const updown = Math.cos(x*Math.PI*2*freqA + phaseA*Math.PI*2)*ampA*3
+    const leftright = Math.sin(x*Math.PI*2*freqA + phaseA*Math.PI*2)*ampA*3
+
+
+    if(polar) {
+      return new Vector3(Math.sin(x*2*Math.PI)*(40/Math.PI+leftright), updown, Math.cos(x*2*Math.PI)*(40/Math.PI+leftright))
+    } else {
+      return new Vector3(x*40, updown, leftright)
+    }
   })
   $: pointsB = Array(samples).fill(null).map((_,i,a) => (i/a.length - 0.5)*2).map((x) => {
-    return new Vector3(x*40, Math.cos(x*Math.PI*2*freqB + phaseB*Math.PI*2)*ampB*3, Math.sin(x*Math.PI*2*freqB + phaseB*Math.PI*2)*ampB*3)
+    const updown = Math.cos(x*Math.PI*2*freqB + phaseB*Math.PI*2)*ampB*3
+    const leftright = Math.sin(x*Math.PI*2*freqB + phaseB*Math.PI*2)*ampB*3
+
+    if(polar) {
+      return new Vector3(Math.sin(x*2*Math.PI)*(40/Math.PI+leftright), updown, Math.cos(x*2*Math.PI)*(40/Math.PI+leftright))
+    } else {
+      return new Vector3(x*40, updown, leftright)
+    }
   })
 
   $: pointsCombined = Array(samples).fill(null).map((_,i,a) => (i/a.length - 0.5)*2).map((x,i) => {
-    return new Vector3(x*40, pointsA[i].y+pointsB[i].y, pointsA[i].z+pointsB[i].z)
+    const updown = Math.cos(x*Math.PI*2*freqA + phaseA*Math.PI*2)*ampA*3 + Math.cos(x*Math.PI*2*freqB + phaseB*Math.PI*2)*ampB*3
+    const leftright = Math.sin(x*Math.PI*2*freqA + phaseA*Math.PI*2)*ampA*3 + Math.sin(x*Math.PI*2*freqB + phaseB*Math.PI*2)*ampB*3
+
+    if(polar) {
+      return new Vector3(Math.sin(x*2*Math.PI)*(40/Math.PI+leftright), updown, Math.cos(x*2*Math.PI)*(40/Math.PI+leftright))
+    } else {
+      return new Vector3(x*40, updown, leftright)
+    }
   })
 </script>
 
