@@ -14,6 +14,7 @@
   })
 
   let polar = false
+  let polarTight = false
 
   let playing = false
   let speedA = 1
@@ -232,6 +233,12 @@
       <p>
         For periodic signals (i.e. those having a discrete spectrum of integer frequencies) the time axis can be though thought of as folded into a circle with the circumference of the longest period, i.e. the inverse of the lowest frequence. For non-periodic signals the spectrum would be continuous making the lowest frequency infinitely  small and the radius infinitely  large, i.e. stretching  it back into a line.
       </p>
+
+     <div class="checkbox-list">
+        <label>
+          <input type="checkbox" bind:checked={polarTight}> Fold as tight as possible
+        </label>
+     </div>
       {/if}
   </fieldset>
 
@@ -298,5 +305,5 @@
 </div>
 
 <Canvas>
-  <Scene {polar} {hideParts} {freqA} {ampA} {phaseA} {freqB} {ampB} {phaseB} {showB} {showSum} />
+  <Scene {polarTight} {polar} {hideParts} {freqA} {ampA} {phaseA} {freqB} {ampB} {phaseB} {showB} {showSum} />
 </Canvas>
