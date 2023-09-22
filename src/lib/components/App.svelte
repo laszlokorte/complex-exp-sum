@@ -17,6 +17,7 @@
   let polarTight = false
 
   let playing = false
+  let playbackSpeed = 1
   let speedA = 1
   let speedB = 1
 
@@ -49,8 +50,8 @@
       frame = null
 
       if(playing) {
-        phaseA = phaseA + freqA * speedA / 1000
-        phaseB = phaseB + freqB * speedB / 1000
+        phaseA = phaseA + freqA * playbackSpeed * speedA / 1000
+        phaseB = phaseB + freqB * playbackSpeed * speedB / 1000
         while(phaseA > 1) {
           phaseA -= 2
         }
@@ -221,6 +222,29 @@
     {/if}
   </fieldset>
 
+
+
+  {#if showB}
+  <fieldset>
+    <legend>Sum</legend>
+
+
+   <div class="checkbox-list">
+      <label>
+        <input style:accent-color="#fff"  type="checkbox" bind:checked={showSum}> Show Sum
+      </label>
+
+      {#if showSum}
+
+      <label>
+        <input style:accent-color="#fff"  type="checkbox" bind:checked={hideParts}> Hide individuals
+      </label>
+      {/if}
+   </div>
+    
+  </fieldset>
+  {/if}
+
   <fieldset>
     <legend>Periodicity</legend>
 
@@ -253,38 +277,18 @@
 
 
     {#if playing}
-    <strong style:padding-top="1em">Propagation</strong>
-    <dl style:gap="0 2em" style:justify-content="start" style:align-items="end">
-    <dt><label for="speedB">speed A: {numberFormatDecimal.format(speedA)}</label></dt>
-    <dd><input style:accent-color="#3dfe00" type="range" min="-1" step="0.01" max="1" bind:value={speedA} id="speedB" /></dd>
-    <dt class:hidden={lockPhase || conjugate}><label for="speedB">speed B: {numberFormatDecimal.format(speedB)}</label></dt>
+    <dl>
+    <dt style:align-self="end"><label for="playback">Playback speed: {numberFormatDecimal.format(playbackSpeed)}</label></dt>
+    <dd><input type="range" min="0" step="0.01" max="3" bind:value={playbackSpeed} id="playback" /></dd>
+    <dt><label for="speedA">propagation<br>speed A: {numberFormatDecimal.format(speedA)}</label></dt>
+    <dd><input style:accent-color="#3dfe00" type="range" min="-1" step="0.01" max="1" bind:value={speedA} id="speedA" /></dd>
+    <dt class:hidden={lockPhase || conjugate}><label for="speedB">propagation<br>speed B: {numberFormatDecimal.format(speedB)}</label></dt>
     <dd class:hidden={lockPhase || conjugate}><input style:accent-color="#fe3d00" type="range" min="-1" step="0.01" max="1" bind:value={speedB} id="speedB" /></dd>
     </dl>
     {/if}
     
   </fieldset>
 
-
-  {#if showB}
-  <fieldset>
-    <legend>Sum</legend>
-
-
-   <div class="checkbox-list">
-      <label>
-        <input style:accent-color="#fff"  type="checkbox" bind:checked={showSum}> Show Sum
-      </label>
-
-      {#if showSum}
-
-      <label>
-        <input style:accent-color="#fff"  type="checkbox" bind:checked={hideParts}> Hide individuals
-      </label>
-      {/if}
-   </div>
-    
-  </fieldset>
-  {/if}
 
   <details>
     <summary>Explanation</summary>
