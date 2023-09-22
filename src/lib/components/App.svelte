@@ -40,7 +40,6 @@
     phaseB = -1 * phaseA
   } else if(lockPhase) {
     phaseB = phaseA
-    speedB = (Math.sign(freqB)*Math.sign(freqA) || 1) * speedA
   }
 
   onMount(() => {
@@ -50,8 +49,8 @@
       frame = null
 
       if(playing) {
-        phaseA = phaseA + (Math.sign(freqA)||1) * speedA / 100
-        phaseB = phaseB + (Math.sign(freqB)||1) * speedB / 100
+        phaseA = phaseA + freqA * speedA / 1000
+        phaseB = phaseB + freqB * speedB / 1000
         while(phaseA > 1) {
           phaseA -= 2
         }
@@ -95,7 +94,7 @@
 
   dl {
     display: grid;
-    padding: 0;
+    padding: 0.4em 0;
     margin: 0;
     grid-auto-flow: column;
     grid-template-rows: auto auto;
@@ -170,6 +169,11 @@
     color: #fff;
   }
 
+  .hidden {
+    visibility: hidden;
+    pointer-events: none;
+  }
+
 </style>
 
 <div class="controls">
@@ -210,10 +214,8 @@
       <dt>
         <label for="phaseB">Phase: {numberFormatDecimal.format(phaseB)}</label></dt>
       <dd><input disabled={conjugate || lockPhase} style:accent-color="#fe3d00" type="range" min="-1" max="1" step="0.005" bind:value={phaseB} id="phaseB" />
-        {#if !conjugate}
         <br>
-        <label><input type="checkbox" style:accent-color="#fe3d00" bind:checked={lockPhase}> Same as A</label>
-        {/if}
+        <label class:hidden={conjugate}><input type="checkbox" style:accent-color="#fe3d00" bind:checked={lockPhase}> Same as A</label>
       </dd>
     </dl>
     {/if}
@@ -225,6 +227,9 @@
 
    <div class="checkbox-list">
       <label>
+        <input type="checkbox" bind:checked={polarTight}> Show only one period
+      </label>
+      <label>
         <input type="checkbox" bind:checked={polar}> Wrap time axis
       </label>
    </div>
@@ -233,12 +238,6 @@
       <p>
         For periodic signals (i.e. those having a discrete spectrum of integer frequencies) the time axis can be though thought of as folded into a circle with the circumference of the longest period, i.e. the inverse of the lowest frequence. For non-periodic signals the spectrum would be continuous making the lowest frequency infinitely  small and the radius infinitely  large, i.e. stretching  it back into a line.
       </p>
-
-     <div class="checkbox-list">
-        <label>
-          <input type="checkbox" bind:checked={polarTight}> Fold as tight as possible
-        </label>
-     </div>
       {/if}
   </fieldset>
 
@@ -250,15 +249,18 @@
       <label>
         <input  type="checkbox" bind:checked={playing}> Animate Phase
       </label>
-      {#if playing}
-      <dl>
-      <dt><label for="speedB">Speed A: {numberFormatDecimal.format(speedA)}</label></dt>
-      <dd><input style:accent-color="#3dfe00" type="range" min="-1" step="0.01" max="1" bind:value={speedA} id="speedB" /></dd>
-      <dt><label for="speedB">Speed B: {numberFormatDecimal.format(speedB)}</label></dt>
-      <dd><input disabled={lockPhase || conjugate} style:accent-color="#fe3d00" type="range" min="-1" step="0.01" max="1" bind:value={speedB} id="speedB" /></dd>
-      </dl>
-      {/if}
    </div>
+
+
+    {#if playing}
+    <strong style:padding-top="1em">Propagation</strong>
+    <dl style:gap="0 2em" style:justify-content="start" style:align-items="end">
+    <dt><label for="speedB">speed A: {numberFormatDecimal.format(speedA)}</label></dt>
+    <dd><input style:accent-color="#3dfe00" type="range" min="-1" step="0.01" max="1" bind:value={speedA} id="speedB" /></dd>
+    <dt class:hidden={lockPhase || conjugate}><label for="speedB">speed B: {numberFormatDecimal.format(speedB)}</label></dt>
+    <dd class:hidden={lockPhase || conjugate}><input style:accent-color="#fe3d00" type="range" min="-1" step="0.01" max="1" bind:value={speedB} id="speedB" /></dd>
+    </dl>
+    {/if}
     
   </fieldset>
 
