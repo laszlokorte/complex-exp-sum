@@ -9,8 +9,10 @@
   } from '@threlte/extras'
   import { Vector3, CatmullRomCurve3 } from 'three'
 
+  export let showGrid = true
+
   export let polar = false
-  export let polarTight = false
+  export let singlePeriod = false
   export let samples = 1000
   export let perspective = true
 
@@ -34,43 +36,45 @@
     return gcd(b, a % b);
   }
 
-  $: scaleFrequency = polarTight ? gcd(freqA, freqB) : 1
+  $: scaleFrequency = singlePeriod ? Math.abs((gcd(freqA, freqB)||1)) : 1
+  $: radiusScale = 1/Math.sqrt(scaleFrequency)
 
-  $: pointsA = Array(samples).fill(null).map((_,i,a) => (i/a.length - 0.5)*2).map((x) => {
-    const updown = Math.cos(x*Math.PI*2*freqA/scaleFrequency + phaseA*Math.PI*2)*ampA*3
-    const leftright = Math.sin(x*Math.PI*2*freqA/scaleFrequency + phaseA*Math.PI*2)*ampA*3
+  $: pointsA = Array(samples).fill(null).map((_,i,a) => (i/a.length - 0.5)*2/scaleFrequency).map((x) => {
+    const impart = Math.sin(x*Math.PI*2*freqA + phaseA*Math.PI*2)*ampA*3
+    const realPart = Math.cos(x*Math.PI*2*freqA + phaseA*Math.PI*2)*ampA*3
 
 
     if(polar) {
-      return new Vector3(Math.sin(x*2*Math.PI)*(40/Math.PI+leftright), updown, Math.cos(x*2*Math.PI)*(40/Math.PI+leftright))
+      return new Vector3(Math.cos(x*2*Math.PI*scaleFrequency)*radiusScale*(40/Math.PI+realPart), impart, Math.sin(x*2*Math.PI*scaleFrequency)*radiusScale*(40/Math.PI+realPart))
     } else {
-      return new Vector3(x*40, updown, leftright)
+      return new Vector3(x*40, impart, -realPart)
     }
   })
-  $: pointsB = Array(samples).fill(null).map((_,i,a) => (i/a.length - 0.5)*2).map((x) => {
-    const updown = Math.cos(x*Math.PI*2*freqB/scaleFrequency + phaseB*Math.PI*2)*ampB*3
-    const leftright = Math.sin(x*Math.PI*2*freqB/scaleFrequency + phaseB*Math.PI*2)*ampB*3
+  $: pointsB = Array(samples).fill(null).map((_,i,a) => (i/a.length - 0.5)*2/scaleFrequency).map((x) => {
+    const impart = Math.sin(x*Math.PI*2*freqB + phaseB*Math.PI*2)*ampB*3
+    const realPart = Math.cos(x*Math.PI*2*freqB + phaseB*Math.PI*2)*ampB*3
 
     if(polar) {
-      return new Vector3(Math.sin(x*2*Math.PI)*(40/Math.PI+leftright), updown, Math.cos(x*2*Math.PI)*(40/Math.PI+leftright))
+      return new Vector3(Math.cos(x*2*Math.PI*scaleFrequency)*radiusScale*(40/Math.PI+realPart), impart, Math.sin(x*2*Math.PI*scaleFrequency)*radiusScale*(40/Math.PI+realPart))
     } else {
-      return new Vector3(x*40, updown, leftright)
+      return new Vector3(x*40, impart, -realPart)
     }
   })
 
-  $: pointsCombined = Array(samples).fill(null).map((_,i,a) => (i/a.length - 0.5)*2).map((x,i) => {
-    const updown = Math.cos(x*Math.PI*2*freqA/scaleFrequency + phaseA*Math.PI*2)*ampA*3 + Math.cos(x*Math.PI*2*freqB/scaleFrequency + phaseB*Math.PI*2)*ampB*3
-    const leftright = Math.sin(x*Math.PI*2*freqA/scaleFrequency + phaseA*Math.PI*2)*ampA*3 + Math.sin(x*Math.PI*2*freqB/scaleFrequency + phaseB*Math.PI*2)*ampB*3
+  $: pointsCombined = Array(samples).fill(null).map((_,i,a) => (i/a.length - 0.5)*2/scaleFrequency).map((x,i) => {
+    const impart = Math.sin(x*Math.PI*2*freqA + phaseA*Math.PI*2)*ampA*3 + Math.sin(x*Math.PI*2*freqB + phaseB*Math.PI*2)*ampB*3
+    const realPart = Math.cos(x*Math.PI*2*freqA + phaseA*Math.PI*2)*ampA*3 + Math.cos(x*Math.PI*2*freqB + phaseB*Math.PI*2)*ampB*3
 
     if(polar) {
-      return new Vector3(Math.sin(x*2*Math.PI)*(40/Math.PI+leftright), updown, Math.cos(x*2*Math.PI)*(40/Math.PI+leftright))
+      return new Vector3(Math.cos(x*2*Math.PI*scaleFrequency)*radiusScale*(40/Math.PI+realPart), impart, Math.sin(x*2*Math.PI*scaleFrequency)*radiusScale*(40/Math.PI+realPart))
     } else {
-      return new Vector3(x*40, updown, leftright)
+      return new Vector3(x*40, impart, -realPart)
     }
   })
 </script>
 
 
+{#if showGrid}
 <Grid
   gridSize={[80, 80]}
   cellColor={'#46536b'}
@@ -79,6 +83,7 @@
   depthWrite={false}
   depthTest={true}
 />
+{/if}
 
 {#if !showSum || !hideParts}
 

@@ -13,8 +13,9 @@
     maximumFractionDigits: 2,
   })
 
+  let showGrid = true
   let polar = false
-  let polarTight = false
+  let singlePeriod = false
 
   let playing = false
   let playbackSpeed = 1
@@ -88,9 +89,11 @@
     position: absolute;
     top: 1em;
     left: 1em;
+    bottom: 1em;
     color: #fff;
     width: 100%;
     max-width: 40em;
+    overflow: auto;
   }
 
   dl {
@@ -139,7 +142,6 @@
   summary {
     display: inline-block;
     padding: 2px 5px;
-    background: #111;
     color: #fff;
     position: relative;
     top: -0.5em;
@@ -154,8 +156,12 @@
   details {
     background: #223c;
     border: #112f;
-    margin: 0 0 1em 0;
-    padding: 0 1em 1em;
+    margin: 1em 0 0 0;
+    padding: 1em 0 1em;
+  }
+
+  details > p:first-of-type {
+    margin-top: 0;
   }
 
   h2 {
@@ -251,16 +257,17 @@
 
    <div class="checkbox-list">
       <label>
-        <input type="checkbox" bind:checked={polarTight}> Show only one period
+        <input type="checkbox" bind:checked={singlePeriod}> Show only one period
       </label>
       <label>
         <input type="checkbox" bind:checked={polar}> Wrap time axis
       </label>
    </div>
     
-      {#if polar}
+      {#if polar || singlePeriod}
       <p>
-        For periodic signals (i.e. those having a discrete spectrum of integer frequencies) the time axis can be though thought of as folded into a circle with the circumference of the longest period, i.e. the inverse of the lowest frequence. For non-periodic signals the spectrum would be continuous making the lowest frequency infinitely  small and the radius infinitely  large, i.e. stretching  it back into a line.
+        If all frequencies of a signal have a least common denominator (LCD), this LCD is called the fundamental frequency. The frequencies can then be expressed as integer multiples of the LCD. Signals with such a fundamental frequency are periodic. The period length is the inverse of the fundamental.
+        For such signals the timeline can be though of as being folded into a circle with a circumference equal to the period length. 
       </p>
       {/if}
   </fieldset>
@@ -289,21 +296,32 @@
     
   </fieldset>
 
+  <fieldset>
+    <legend>More</legend>
 
-  <details>
-    <summary>Explanation</summary>
-    
-    <p>
-      Explore how two complex waves/oscillations interfere de- or constructively. Use the controls above to set the frequency, amplitude and phase of the waves. Enable either both or only one of the waves and show or hide the sum. 
-    </p>
+     <div class="checkbox-list">
+        <label>
+          <input  type="checkbox" bind:checked={showGrid}> Show Grid
+        </label>
+     </div>
 
-    <p>
-      If the one wave has the opposite(negative) frequency of the other wave their sum oscialates in only one direction because the other direction is cancelled by destructive interference. The difference of their two phases determines the direction in which the interference occurrs. Changing the phase of only one of the summed waves results in the sum to be rotated.
-    </p>
-    <p>
-      If neither frequency nor amplitude of the two waves match then their sum may look pretty wild. You may enable only the sum and hide the two individual waves for a better view.
-    </p>
-  </details>
+    <details>
+      <summary>Explanation</summary>
+      
+      <p>
+        Explore how two complex waves/oscillations interfere de- or constructively. Use the controls above to set the frequency, amplitude and phase of the waves. Enable either both or only one of the waves and show or hide the sum. 
+      </p>
+
+      <p>
+        If the one wave has the opposite(negative) frequency of the other wave their sum oscialates in only one direction because the other direction is cancelled by destructive interference. The difference of their two phases determines the direction in which the interference occurrs. Changing the phase of only one of the summed waves results in the sum to be rotated.
+      </p>
+      <p>
+        If neither frequency nor amplitude of the two waves match then their sum may look pretty wild. You may enable only the sum and hide the two individual waves for a better view.
+      </p>
+    </details>
+  </fieldset>
+
+  
 
   <footer>
     <a href="https://tools.laszlokorte.de">More educational tools</a>
@@ -311,5 +329,5 @@
 </div>
 
 <Canvas>
-  <Scene {polarTight} {polar} {hideParts} {freqA} {ampA} {phaseA} {freqB} {ampB} {phaseB} {showB} {showSum} />
+  <Scene {showGrid} {singlePeriod} {polar} {hideParts} {freqA} {ampA} {phaseA} {freqB} {ampB} {phaseB} {showB} {showSum} />
 </Canvas>
